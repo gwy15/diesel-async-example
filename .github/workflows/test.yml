@@ -28,7 +28,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           default: true
       - name: Install diesel cli and run migrations
-        run:
+        run: |
           cargo install diesel_cli --no-default-features --features mysql
           diesel migration run
       - name: cargo generate-lockfile
