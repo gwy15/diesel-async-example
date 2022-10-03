@@ -1,5 +1,8 @@
 pub type Backend = diesel::mysql::Mysql;
 
+/// max connections made to mysql
+const MAX_CONNECTIONS: u32 = 30;
+
 #[cfg(feature = "async")]
 pub type Conn = diesel_async::AsyncMysqlConnection;
 #[cfg(feature = "async")]
@@ -14,7 +17,7 @@ pub type Pool = diesel::r2d2::Pool<diesel::r2d2::ConnectionManager<Conn>>;
 pub async fn connect(url: &str) -> anyhow::Result<Pool> {
     let config = diesel_async::pooled_connection::AsyncDieselConnectionManager::<Conn>::new(url);
     let pool = Pool::builder()
-        .max_size(super::MAX_CONNECTIONS)
+        .max_size(MAX_CONNECTIONS)
         .build(config)
         .await?;
     Ok(pool)
@@ -23,9 +26,7 @@ pub async fn connect(url: &str) -> anyhow::Result<Pool> {
 #[cfg(feature = "sync")]
 pub fn connect(url: &str) -> anyhow::Result<Pool> {
     let config = diesel::r2d2::ConnectionManager::<Conn>::new(url);
-    let pool = Pool::builder()
-        .max_size(super::MAX_CONNECTIONS)
-        .build(config)?;
+    let pool = Pool::builder().max_size(MAX_CONNECTIONS).build(config)?;
     Ok(pool)
 }
 

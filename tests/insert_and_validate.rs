@@ -1,57 +1,16 @@
-#[macro_use]
-extern crate tracing;
-
-pub mod db;
-pub mod models;
-pub mod schema;
-
-pub(crate) mod prelude {
-    pub use crate::{db, models, schema};
-    pub use anyhow::{anyhow, bail, Context, Error, Result};
-    pub use chrono::{DateTime, Utc};
-    pub use db::{Conn, Pool};
-    pub use diesel::associations::HasTable;
-    pub use diesel::{
-        AsChangeset, ExpressionMethods, Identifiable, Insertable, OptionalExtension, QueryDsl,
-        Queryable,
-    };
-    pub use futures::FutureExt;
-
-    #[cfg(feature = "async")]
-    pub use diesel_async::RunQueryDsl;
-    #[cfg(feature = "async")]
-    pub trait Executor: diesel_async::AsyncConnection<Backend = db::Backend> {}
-    #[cfg(feature = "async")]
-    impl<T> Executor for T where T: diesel_async::AsyncConnection<Backend = db::Backend> {}
-
-    #[cfg(feature = "sync")]
-    pub use diesel::RunQueryDsl;
-    #[cfg(feature = "sync")]
-    pub trait Executor:
-        diesel::Connection<Backend = db::Backend> + diesel::connection::LoadConnection
-    {
-    }
-    #[cfg(feature = "sync")]
-    impl<T> Executor for T where
-        T: diesel::Connection<Backend = db::Backend> + diesel::connection::LoadConnection
-    {
-    }
-}
+use diesel_async_example::prelude::*;
 use std::sync::Arc;
-
-use prelude::*;
+use tracing::*;
 
 /// how many threads / futures are running at the same time
-const THREAD_COUNT: usize = 50;
+const THREAD_COUNT: usize = 100;
 /// for each thread / future, how many iterations to go
-const ITERATIONS: usize = 1000;
-/// max connections made to mysql
-const MAX_CONNECTIONS: u32 = 30;
+const ITERATIONS: usize = 200;
 
-#[tokio::main]
+#[tokio::test]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv()?;
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt::try_init().ok();
 
     let url = dotenv::var("DATABASE_URL")?;
     #[cfg(feature = "async")]
@@ -69,7 +28,8 @@ async fn main() -> anyhow::Result<()> {
             })
             .collect::<Vec<_>>(),
     )
-    .await?;
+    .await
+    .unwrap(); // unwrap so that the error message shows
 
     #[cfg(feature = "sync")]
     let handles = (0..THREAD_COUNT)
@@ -80,7 +40,8 @@ async fn main() -> anyhow::Result<()> {
         .collect::<Vec<_>>();
     #[cfg(feature = "sync")]
     for handle in handles {
-        handle.join().unwrap()?;
+        // unwrap so that the error message shows
+        handle.join().unwrap().unwrap();
     }
 
     Ok(())
