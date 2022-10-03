@@ -1,0 +1,44 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+name: test
+
+jobs:
+  required:
+    runs-on: ubuntu-latest
+    name: ubuntu / ${{ matrix.toolchain }} / ${{ matrix.features }}
+    strategy:
+      matrix:
+        toolchain: [stable, beta]
+        features: [async, sync]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: '5.7'
+          mysql database: 'db'
+          mysql root password: NNe47zF3JRhr6Ykb # this is intensional
+      - name: Install ${{ matrix.toolchain }}
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.toolchain }}
+          default: true
+      - name: Install diesel cli and run migrations
+        run:
+          cargo install diesel-cli --no-default-features --features mysql
+          diesel migration run
+      - name: cargo generate-lockfile
+        if: hashFiles('Cargo.lock') == ''
+        uses: actions-rs/cargo@v1
+        with:
+          command: generate-lockfile
+      # https://twitter.com/jonhoo/status/1571290371124260865
+      - name: cargo test --locked
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --locked --no-default-features --features ${{ matrix.features }} --all-targets
