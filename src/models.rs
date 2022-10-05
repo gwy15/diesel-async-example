@@ -66,6 +66,7 @@ impl User {
         Ok(())
     }
 
+    #[cfg(feature = "async")]
     pub async fn cyclic_create<C: Executor>(conn: &mut C) -> Result<u64> {
         let id = conn
             .transaction::<_, Error, _>(|conn| async move {
