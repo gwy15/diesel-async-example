@@ -20,5 +20,6 @@ tokio = { version = "1.21.2", features = ["full"] }
 tracing = "0.1.36"
 tracing-subscriber = "0.3.15"
 
-# [patch.crates-io]
-# diesel = { path = "../diesel/diesel" }
+[patch.crates-io]
+diesel-async = { git = "https://github.com/gwy15/diesel_async.git", branch = "bugfix/mysql-close-stmt" }
+diesel = { git = "https://github.com/gwy15/diesel.git", branch = "feat/datetime-utc" }

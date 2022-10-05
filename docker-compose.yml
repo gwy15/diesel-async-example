@@ -9,3 +9,13 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: NNe47zF3JRhr6Ykb
       MYSQL_DATABASE: db
+  # mariadb:
+  #   image: mariadb:latest
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - ./maria-data:/var/lib/mysql
+  #   environment:
+  #     MARIADB_ROOT_PASSWORD: NNe47zF3JRhr6Ykb
+  #     MARIADB_DATABASE: db
+    

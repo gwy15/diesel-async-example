@@ -13,10 +13,8 @@ pub struct User {
     pub id: u64,
     pub name: String,
     pub email: String,
-    // pub created_at: DateTime<Utc>,
-    // pub updated_at: DateTime<Utc>,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Identifiable, AsChangeset)]
@@ -66,6 +64,28 @@ impl User {
             .execute(conn)
             .await?;
         Ok(())
+    }
+
+    pub async fn cyclic_create<C: Executor>(conn: &mut C) -> Result<u64> {
+        let id = conn
+            .transaction::<_, Error, _>(|conn| async move {
+                let new = NewUser {
+                    name: "tmp",
+                    email: "tmp",
+                };
+                let id = Self::insert(new, conn).await?;
+                let new_name = format!("cyclic-{}", id);
+                let update = UserChange {
+                    id,
+                    name: Some(&new_name),
+                    email: Some(&new_name),
+                };
+                Self::update(update, conn).await?;
+                Ok(id)
+            }.boxed())
+            .await?;
+
+        Ok(id)
     }
 
     #[cfg(feature = "sync")]

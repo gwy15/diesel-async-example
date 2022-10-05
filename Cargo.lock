@@ -340,8 +340,7 @@ dependencies = [
 [[package]]
 name = "diesel"
 version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01e2adfd0a7a81070ed7beec0c62636458926326c16fedb77796d41e447b282d"
+source = "git+https://github.com/gwy15/diesel.git?branch=feat/datetime-utc#bb33ba7072c1fc35dc0226d18ed4b8bb93dee994"
 dependencies = [
  "bitflags",
  "byteorder",
@@ -356,8 +355,6 @@ dependencies = [
 [[package]]
 name = "diesel-async"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "feb10da4975043a203e2de82ecba8e3d3d5bfe8e3de6ccd210b486302f558a26"
 dependencies = [
  "async-trait",
  "bb8",
@@ -387,8 +384,7 @@ dependencies = [
 [[package]]
 name = "diesel_derives"
 version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22a7ab9d7967e6a1a247ea38aedf88ab808b4ac0c159576bc71866ab8f9f9250"
+source = "git+https://github.com/gwy15/diesel.git?branch=feat/datetime-utc#bb33ba7072c1fc35dc0226d18ed4b8bb93dee994"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",

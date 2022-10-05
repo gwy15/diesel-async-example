@@ -71,8 +71,15 @@ async fn insert_and_validate(thread_id: usize, count: usize, pool: Arc<Pool>) ->
         let rows_affected = models::User::delete(id, &mut conn).await?;
         assert_eq!(rows_affected, 1);
 
-        // let user = models::User::cyclic_create(&mut conn).await?;
-        // assert_eq!(user.name, format!("cyclic-{}", user.id));
+        debug!("thread {} done {}/{}", thread_id, i, count);
+
+        let id = models::User::cyclic_create(&mut conn).await?;
+        let user = models::User::from_id(id, &mut conn)
+            .await?
+            .context("no user")?;
+        assert_eq!(id, user.id);
+        assert_eq!(user.name, format!("cyclic-{}", user.id));
+        assert_eq!(user.email, format!("cyclic-{}", user.id));
     }
     debug!(thread_id, "pass");
 
