@@ -21,5 +21,5 @@ tracing = "0.1.36"
 tracing-subscriber = "0.3.15"
 
 [patch.crates-io]
-diesel-async = { git = "https://github.com/gwy15/diesel_async.git", branch = "bugfix/mysql-close-stmt" }
+diesel-async = { git = "https://github.com/weiznich/diesel_async" }
 diesel = { git = "https://github.com/gwy15/diesel.git", branch = "feat/datetime-utc" }
